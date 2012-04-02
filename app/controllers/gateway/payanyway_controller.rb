@@ -10,7 +10,7 @@ class Gateway::PayanywayController < Spree::BaseController
       flash[:error] = I18n.t('invalid_arguments')
       redirect_to :back
     else
-      @signature = Digest::MD5.hexdigest([ @gateway.options[:id], @order.id, @order.total, @gateway.options[:currency_code], @gateway.mode, @gateway.options[:signature] ].join)
+      @signature = Digest::MD5.hexdigest([ @gateway.options[:id], @order.id, format("%.2f", @order.total), @gateway.options[:currency_code], @gateway.mode, @gateway.options[:signature] ].join)
     end
   end
 
