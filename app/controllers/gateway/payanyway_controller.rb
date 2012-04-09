@@ -36,7 +36,7 @@ class Gateway::PayanywayController < Spree::BaseController
     @order.update!
     if @order && @gateway && @order.complete?
       session[:order_id] = nil
-      redirect_to order_path(@order), :notice => I18n.t("order_processed_successfully")
+      redirect_to after_success_path(@order), :notice => I18n.t("order_processed_successfully")
     else
       flash[:error] = t("payment_fail")
       redirect_to root_url
@@ -48,7 +48,13 @@ class Gateway::PayanywayController < Spree::BaseController
     redirect_to @order.blank? ? root_url : checkout_state_path("payment")
   end
 
-  private
+protected
+
+  def after_success_path(resource)
+    order_path(resource)
+  end
+
+private
 
   def load_order
     @order = Order.find_by_id(params['MNT_TRANSACTION_ID'])
