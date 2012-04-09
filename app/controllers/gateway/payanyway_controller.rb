@@ -16,13 +16,9 @@ class Gateway::PayanywayController < Spree::BaseController
 
   def result
     if @order && @gateway
-      payment = @order.payments.build(:payment_method => @order.payment_method)
+      payment = @order.payments.find_by_state_and_amount("pending", @order.total)
       payment.state = "completed"
-      payment.amount = @order.total
       payment.save
-      @order.save!
-      @order.next! until @order.state == "complete"
-      @order.update!
 
       render :text => "SUCCESS"
     else
@@ -31,6 +27,13 @@ class Gateway::PayanywayController < Spree::BaseController
   end
 
   def success
+    payment = @order.payments.build(:payment_method => @order.payment_method)
+    payment.state = "pending"
+    payment.amount = @order.total
+    payment.save
+    @order.save!
+    @order.next! until @order.state == "complete"
+    @order.update!
     if @order && @gateway && @order.complete?
       session[:order_id] = nil
       redirect_to order_path(@order), :notice => I18n.t("order_processed_successfully")
