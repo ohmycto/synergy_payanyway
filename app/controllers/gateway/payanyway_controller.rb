@@ -16,7 +16,7 @@ class Gateway::PayanywayController < Spree::BaseController
 
   def result
     if @order && @gateway
-      payment = @order.payments.find_by_state_and_amount("pending", @order.total)
+      payment = @order.payments.first
       payment.state = "completed"
       payment.save
 
