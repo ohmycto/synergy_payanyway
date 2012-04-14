@@ -17,8 +17,8 @@ class Gateway::PayanywayController < Spree::BaseController
   def result
     if @order && @gateway
       payment = @order.payments.first
-      payment.state = "completed"
-      payment.save
+      payment.complete
+      @order.update!
 
       render :text => "SUCCESS"
     else
