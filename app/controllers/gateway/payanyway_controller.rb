@@ -1,6 +1,7 @@
 class Gateway::PayanywayController < Spree::BaseController
   skip_before_filter :verify_authenticity_token, :only => [:result, :success, :fail]
-  before_filter :load_order,                     :only => [:result, :success, :fail]
+
+  before_filter :load_order, :only => [:result, :success, :fail]
 
   def show
     @order =  Order.find(params[:order_id])
@@ -15,14 +16,10 @@ class Gateway::PayanywayController < Spree::BaseController
   end
 
   def result
-    if @order && @gateway
-      payment = @order.payments.first
-      payment.complete
-      @order.update!
-
-      render :text => "SUCCESS"
+    if complete_or_create_payment(@order, @gateway)
+      render :text => 'SUCCESS'
     else
-      render :text => "FAIL"
+      render :text => 'FAIL'
     end
   end
 
@@ -44,20 +41,36 @@ class Gateway::PayanywayController < Spree::BaseController
   end
 
   def fail
-    flash[:error] = t("payment_fail")
-    redirect_to @order.blank? ? root_url : checkout_state_path("payment")
+    flash[:error] = t('payment_fail')
+    redirect_to @order.blank? ? root_url : checkout_state_path('payment')
   end
 
-protected
+  protected
 
   def after_success_path(resource)
     order_path(resource)
   end
 
-private
+  private
 
   def load_order
     @order = Order.find_by_id(params['MNT_TRANSACTION_ID'])
     @gateway = Gateway::Payanyway.current
+  end
+  
+  def complete_or_create_payment(order, gateway)
+    return unless order && gateway
+
+    unless (payment = order.payments.first) && payment.complete!
+      order.payments.destroy_all
+
+      order.payments.create! do |p|
+        p.payment_method = gateway
+        p.amount = amount
+        p.state = 'completed'
+      end
+    end
+
+    order.update!
   end
 end
