@@ -66,7 +66,7 @@ class Gateway::PayanywayController < Spree::BaseController
 
       order.payments.create! do |p|
         p.payment_method = gateway
-        p.amount = amount
+        p.amount = order.total
         p.state = 'completed'
       end
     end
