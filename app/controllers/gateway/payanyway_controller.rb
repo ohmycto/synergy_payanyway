@@ -24,11 +24,6 @@ class Gateway::PayanywayController < Spree::BaseController
   end
 
   def success
-    payment = @order.payments.build(:payment_method => @order.payment_method)
-    payment.state = "pending"
-    payment.amount = @order.total
-    payment.save
-    @order.save!
     @order.next! until @order.state == "complete"
     @order.update!
     if @order && @gateway && @order.complete?
