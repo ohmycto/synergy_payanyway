@@ -25,4 +25,9 @@ class Gateway::Payanyway < Gateway
   def self.current
     self.where(:type => self.to_s, :environment => Rails.env, :active => true).first
   end
+
+  def source_required?
+    false
+  end
+
 end
