@@ -1,10 +1,13 @@
-class Gateway::Payanyway < Gateway
+class Spree::Gateway::Payanyway < Spree::Gateway
   preference :id, :string
   preference :currency_code, :string, :default => 'RUB'
   preference :signature, :string
   preference :locale, :string, :default => 'ru'
   preference :payment_system, :string
   preference :payment_system_list, :string
+
+  attr_accessible :preferred_id, :preferred_currency_code, :preferred_signature,
+      :preferred_locale, :preferred_payment_system, :preferred_payment_system_list
 
   def method_type
     'payanyway'
