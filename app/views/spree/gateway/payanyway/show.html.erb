@@ -1,6 +1,6 @@
-<%= form_tag(@gateway.url, :method => :post) do %>
+<%= form_tag(@gateway.options[:server], :method => :post) do %>
   <h1><%= "#{t('order')} #{@order.number}" %></h1>
-  <%= render :partial => 'shared/order_details', :locals => {:order => @order} %>
+  <%= render :partial => 'spree/shared/order_details', :locals => {:order => @order} %>
   <%= hidden_field_tag('MNT_ID', @gateway.options[:id], :id => nil) %>
   <%= hidden_field_tag('MNT_TRANSACTION_ID', @order.id, :id => nil) %>
   <%= hidden_field_tag('MNT_CURRENCY_CODE', @gateway.options[:currency_code], :id => nil) %>
@@ -10,5 +10,5 @@
   <%= hidden_field_tag('moneta.locale', @gateway.options[:locale], :id => nil) if @gateway.options[:locale].present? %>
   <%= hidden_field_tag('paymentSystem.unitId', @gateway.options[:payment_system], :id => nil) if @gateway.options[:payment_system].present? %>
   <%= hidden_field_tag('paymentSystem.limitIds', @gateway.options[:payment_system_list], :id => nil) if @gateway.options[:payment_system_list].present? %>
-  <input type="submit" value="Оплатить">
+  <input type="submit" value="Оплатить" />
 <% end %>
