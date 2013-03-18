@@ -1,10 +1,10 @@
-class Spree::Gateway::PayanywayController < Spree::StoreController
+class Gateway::PayanywayController < Spree::BaseController
   skip_before_filter :verify_authenticity_token, :only => [:result, :success, :fail]
 
   before_filter :load_order, :only => [:result, :success, :fail]
 
   def show
-    @order =  Spree::Order.find(params[:order_id])
+    @order =  Order.find(params[:order_id])
     @gateway = @order.available_payment_methods.find{|x| x.id == params[:gateway_id].to_i }
 
     if @order.blank? || @gateway.blank?
@@ -49,8 +49,8 @@ class Spree::Gateway::PayanywayController < Spree::StoreController
   private
 
   def load_order
-    @order = Spree::Order.find_by_id(params['MNT_TRANSACTION_ID'])
-    @gateway = @order.payment_method
+    @order = Order.find_by_id(params['MNT_TRANSACTION_ID'])
+    @gateway = Gateway::Payanyway.current
   end
   
   def complete_or_create_payment(order, gateway)
