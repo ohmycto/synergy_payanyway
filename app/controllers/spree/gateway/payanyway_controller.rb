@@ -17,6 +17,7 @@ class Spree::Gateway::PayanywayController < Spree::StoreController
 
   def result
     if complete_or_create_payment(@order, @gateway)
+      complete_order
       render :text => 'SUCCESS'
     else
       render :text => 'FAIL'
@@ -24,8 +25,6 @@ class Spree::Gateway::PayanywayController < Spree::StoreController
   end
 
   def success
-    @order.next! until @order.state == "complete"
-    @order.update!
     if @order && @gateway && @order.complete?
       session[:order_id] = nil
       redirect_to after_success_path(@order), :notice => I18n.t("order_processed_successfully")
@@ -55,17 +54,19 @@ class Spree::Gateway::PayanywayController < Spree::StoreController
   
   def complete_or_create_payment(order, gateway)
     return unless order && gateway
-
     unless (payment = order.payments.first) && payment.complete!
       order.payments.destroy_all
-
       order.payments.create! do |p|
         p.payment_method = gateway
         p.amount = order.total
         p.state = 'completed'
       end
     end
-
     order.update!
+  end
+
+  def complete_order
+    @order.next! until @order.state == "complete"
+    @order.update!
   end
 end
