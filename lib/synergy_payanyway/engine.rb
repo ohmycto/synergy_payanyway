@@ -17,10 +17,8 @@ module SpreeSynergyPayanyway
       Dir.glob(File.join(File.dirname(__FILE__), "../../app/overrides/*.rb")) do |c|
         Rails.application.config.cache_classes ? require(c) : load(c)
       end
-    end
 
-    initializer "synergy_payanyway.register.payment_methods" do |app|
-      app.config.spree.payment_methods += [ Gateway::Payanyway ]
+      Gateway::Payanyway.register 
     end
 
     config.to_prepare &method(:activate).to_proc
